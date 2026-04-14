@@ -96,9 +96,8 @@ jobs:
 
       - name: Build with Electron Builder
         working-directory: kashikart/kashikart/kashikart-gaurav
-        run: npm run electron-build
+        run: npm run dist
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Verify installer output

@@ -1,5 +1,11 @@
 {
   "name": "kashikart-frontend",
+  "description": "KashiKart Tender Management Desktop Application",
+  "author": "KashiKart",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vizz-bob/kashikartnew14.git"
+  },
   "private": true,
   "version": "0.0.0",
   "type": "module",
