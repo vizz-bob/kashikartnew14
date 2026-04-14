@@ -1,0 +1,6 @@
+{
+  "id": 3,
+  "url": "https://etenders.gov.in/eprocure/app",
+  "scraper": "html",
+  "config": {}
+}

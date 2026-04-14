@@ -1,0 +1,56 @@
+from sqlalchemy.orm import Session
+from app.models.source import Source
+from app.scraping.implementations.html_scraper import HTMLScraper
+from app.scraping.implementations.pdf_scraper import PDFScraper
+from app.scraping.implementations.portal_scraper import PortalScraper
+from app.models.fetch_log import FetchLog, FetchStatus
+from datetime import datetime
+
+SCRAPER_MAP = {
+    "html": HTMLScraper,
+    "pdf": PDFScraper,
+    "portal": PortalScraper,
+}
+
+def run_all_sources(db: Session):
+    sources = (
+        db.query(Source)
+        .filter(Source.is_active == True)
+        .filter(Source.status == "active")
+        .all()
+    )
+
+    for source in sources:
+        scraper_class = SCRAPER_MAP.get(source.scraper_type)
+
+        if not scraper_class:
+            continue
+
+        scraper = scraper_class(source)
+
+        try:
+            tenders = scraper.scrape()  # async handled properly in real code
+
+            # Save tenders to DB (you already have Tender model)
+            # Update stats
+            source.total_tenders += len(tenders)
+            source.last_success_at = datetime.utcnow()
+
+            db.add(FetchLog(
+                source_id=source.id,
+                source_name=source.name,
+                status=FetchStatus.SUCCESS,
+                message="Scraping successful",
+                tenders_found=len(tenders)
+            ))
+
+        except Exception as e:
+            db.add(FetchLog(
+                source_id=source.id,
+                source_name=source.name,
+                status=FetchStatus.ERROR,
+                message="Scraping failed",
+                error_details=str(e)
+            ))
+
+        db.commit()

@@ -1,0 +1,19 @@
+2026-03-13 21:24:07,435 INFO sqlalchemy.engine.Engine SELECT DATABASE()
+2026-03-13 21:24:07,435 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-13 21:24:07,437 INFO sqlalchemy.engine.Engine SELECT @@sql_mode
+2026-03-13 21:24:07,438 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-13 21:24:07,438 INFO sqlalchemy.engine.Engine SELECT @@lower_case_table_names
+2026-03-13 21:24:07,438 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-13 21:24:07,453 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-03-13 21:24:07,485 INFO sqlalchemy.engine.Engine SELECT fetch_logs.id, fetch_logs.source_id, fetch_logs.source_name, fetch_logs.status, fetch_logs.message, fetch_logs.tenders_found, fetch_logs.new_tenders, fetch_logs.updated_tenders, fetch_logs.error_details, fetch_logs.started_at, fetch_logs.completed_at, fetch_logs.duration_seconds, fetch_logs.created_at 
+FROM fetch_logs 
+WHERE lower(fetch_logs.source_name) LIKE lower(%s) ORDER BY fetch_logs.created_at DESC 
+ LIMIT %s
+2026-03-13 21:24:07,486 INFO sqlalchemy.engine.Engine [generated in 0.00062s] ('%Asian Development%', 5)
+ID: 41, Status: FetchStatus.SUCCESS, Tenders: 0, Msg: Fetched 0 tenders: 0 new, 0 updated, Created: 2026-03-13 15:53:33
+ID: 40, Status: FetchStatus.FAILED, Tenders: 0, Msg: Fetch failed: 403 Client Error: Forbidden for url: https://www.adb.org/projects/procurement, Created: 2026-03-13 14:56:42
+ID: 39, Status: FetchStatus.SUCCESS, Tenders: 0, Msg: Fetched 0 tenders: 0 new, 0 updated, Created: 2026-03-13 14:40:20
+ID: 35, Status: FetchStatus.FAILED, Tenders: 0, Msg: Fetch failed: Message: session not created: cannot connect to chrome at 127.0.0.1:49206
+from session not created: , Created: 2026-03-13 13:53:21
+ID: 34, Status: FetchStatus.SUCCESS, Tenders: 0, Msg: Fetched 0 tenders: 0 new, 0 updated, Created: 2026-03-13 13:47:36
+2026-03-13 21:24:07,489 INFO sqlalchemy.engine.Engine ROLLBACK

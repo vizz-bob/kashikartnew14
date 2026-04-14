@@ -1,0 +1,85 @@
+# ─────────────────────────────────────────
+# KashiKart Monorepo — Root .gitignore
+# ─────────────────────────────────────────
+
+# ── Python / Backend ──────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec.bak
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env_backup
+
+# PyInstaller output (keep main.spec, ignore build artifacts)
+Kahiskart-0.0.7-kashikart/build/
+Kahiskart-0.0.7-kashikart/dist/
+
+# Sensitive config — never commit real .env
+Kahiskart-0.0.7-kashikart/.env
+
+# Database files — never commit data
+*.db
+*.sqlite
+*.sqlite3
+tender_dev*.db
+
+# Logs and debug output
+*.log
+*.txt.bak
+backend_out.txt
+server_log.txt
+*_out.txt
+*_debug*.txt
+*_results*.txt
+*_output*.txt
+*_check*.txt
+*_info.txt
+login_debug.txt
+dashboard_debug*.txt
+results.txt
+stats.txt
+
+# ── Node / Frontend ───────────────────────
+kashikart-gaurav/node_modules/
+kashikart-gaurav/dist/
+kashikart-gaurav/release/
+kashikart-gaurav/.env
+kashikart-gaurav/src.zip
+
+# ── macOS ─────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V8
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
+
+# ── IDE / Editor ──────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# ── Temporary & misc ──────────────────────
+*.tmp
+*.bak
+*.orig
+.cache/
+tmp/
+temp/

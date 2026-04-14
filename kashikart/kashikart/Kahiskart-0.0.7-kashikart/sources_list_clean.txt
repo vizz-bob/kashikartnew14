@@ -1,0 +1,18 @@
+2026-03-13 22:07:16,389 INFO sqlalchemy.engine.Engine SELECT DATABASE()
+2026-03-13 22:07:16,390 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-13 22:07:16,391 INFO sqlalchemy.engine.Engine SELECT @@sql_mode
+2026-03-13 22:07:16,391 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-13 22:07:16,391 INFO sqlalchemy.engine.Engine SELECT @@lower_case_table_names
+2026-03-13 22:07:16,392 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-13 22:07:16,393 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-03-13 22:07:16,427 INFO sqlalchemy.engine.Engine SELECT sources.id, sources.name, sources.url, sources.description, sources.login_type, sources.login_url, sources.username, sources.encrypted_password, sources.scraper_type, sources.selector_config, sources.status, sources.is_active, sources.total_tenders, sources.last_fetch_at, sources.last_success_at, sources.consecutive_failures, sources.created_at, sources.updated_at 
+FROM sources
+2026-03-13 22:07:16,428 INFO sqlalchemy.engine.Engine [generated in 0.00047s] ()
+ID: 1, Name: Test HTML Source, Type: html, Tenders: 2
+ID: 2, Name: GeM Portal, Type: webscraper_io, Tenders: 1
+ID: 3, Name: India Tenders Portal, Type: html, Tenders: 1
+ID: 4, Name: SAM.gov, Type: html, Tenders: 2
+ID: 5, Name: Test Site, Type: html, Tenders: 1
+ID: 6, Name: World Bank Procurement, Type: api, Tenders: 20
+ID: 10, Name: Final Verification Source, Type: html, Tenders: 1
+2026-03-13 22:07:16,432 INFO sqlalchemy.engine.Engine ROLLBACK

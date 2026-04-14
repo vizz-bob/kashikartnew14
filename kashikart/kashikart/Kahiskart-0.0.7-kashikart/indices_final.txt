@@ -1,0 +1,33 @@
+
+TABLE: tenders
+Index: PRIMARY, Column: id
+Index: ix_tenders_reference_id, Column: reference_id
+Index: ix_tenders_excel_row_id, Column: excel_row_id
+Index: source_id, Column: source_id
+Index: ix_tenders_status, Column: status
+Index: ix_tenders_deadline_date, Column: deadline_date
+Index: ix_tenders_content_hash, Column: content_hash
+Index: ix_tenders_id, Column: id
+Index: ix_tenders_imported_from_excel, Column: imported_from_excel
+Index: ix_tenders_created_at, Column: created_at
+Index: ix_tenders_agency_name, Column: agency_name
+Index: ix_tenders_title, Column: title
+Index: ix_tenders_published_date, Column: published_date
+
+TABLE: tender_keyword_matches
+Index: PRIMARY, Column: id
+Index: ix_tender_keyword_matches_id, Column: id
+Index: ix_tender_keyword_matches_tender_id, Column: tender_id
+Index: ix_tender_keyword_matches_keyword_id, Column: keyword_id
+
+TABLE: notifications
+Index: PRIMARY, Column: id
+Index: tender_id, Column: tender_id
+Index: ix_notifications_id, Column: id
+Index: ix_notifications_created_at, Column: created_at
+Index: ix_notifications_is_read, Column: is_read
+Index: ix_notifications_module, Column: module
+Index: ix_notifications_user_module_read, Column: user_id
+Index: ix_notifications_user_module_read, Column: module
+Index: ix_notifications_user_module_read, Column: is_read
+Index: ix_notifications_type, Column: type

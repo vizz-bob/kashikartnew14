@@ -1,0 +1,203 @@
+name: Build & Release Windows Installers
+
+# ─────────────────────────────────────────────────────────────────
+# Triggers:
+#   • Push a version tag like  v1.0.0  → full build + GitHub Release
+#   • Manual trigger (Actions tab → Run workflow) → build artifacts only
+# ─────────────────────────────────────────────────────────────────
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a GitHub Release?'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['true', 'false']
+
+jobs:
+  # ───────────────────────────────────────────────────────────────
+  # JOB 1: Build Python FastAPI backend → main.exe via PyInstaller
+  # ───────────────────────────────────────────────────────────────
+  build-backend:
+    name: Build Backend (.exe)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'Kahiskart-0.0.7-kashikart/requirements.txt'
+
+      - name: Install Python dependencies
+        working-directory: Kahiskart-0.0.7-kashikart
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller==6.11.0
+
+      - name: Create production .env
+        working-directory: Kahiskart-0.0.7-kashikart
+        shell: bash
+        run: |
+          cat > .env << 'EOF'
+          DATABASE_URL=sqlite+aiosqlite:///./tender_dev.db
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          ALGORITHM=HS256
+          ACCESS_TOKEN_EXPIRE_MINUTES=60
+          REFRESH_TOKEN_EXPIRE_DAYS=7
+          SMTP_HOST=smtp.gmail.com
+          SMTP_PORT=587
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM_EMAIL=${{ secrets.SMTP_FROM_EMAIL }}
+          APP_ENV=production
+          DEBUG=false
+          EOF
+
+      - name: Build with PyInstaller
+        working-directory: Kahiskart-0.0.7-kashikart
+        run: pyinstaller main.spec
+
+      - name: Verify build output
+        working-directory: Kahiskart-0.0.7-kashikart
+        run: |
+          if (Test-Path "dist\main\main.exe") {
+            Write-Host "✅ main.exe built successfully"
+            Get-Item "dist\main\main.exe" | Select-Object Name, Length
+          } else {
+            Write-Host "❌ Build failed — main.exe not found"
+            exit 1
+          }
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kashikart-backend-${{ github.ref_name || 'dev' }}
+          path: Kahiskart-0.0.7-kashikart/dist/main/
+          retention-days: 30
+
+  # ───────────────────────────────────────────────────────────────
+  # JOB 2: Build React + Electron frontend → NSIS installer .exe
+  # ───────────────────────────────────────────────────────────────
+  build-frontend:
+    name: Build Frontend Installer (.exe)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'kashikart-gaurav/package-lock.json'
+
+      - name: Install Node dependencies
+        working-directory: kashikart-gaurav
+        run: npm ci
+
+      - name: Build React app (Vite)
+        working-directory: kashikart-gaurav
+        run: npm run build
+
+      - name: Package with Electron Builder
+        working-directory: kashikart-gaurav
+        run: npm run electron-build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Disable code signing for now (add cert later for production)
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Verify installer output
+        working-directory: kashikart-gaurav
+        run: |
+          $installer = Get-ChildItem -Path "release" -Filter "*.exe" | Select-Object -First 1
+          if ($installer) {
+            Write-Host "✅ Installer built: $($installer.Name)"
+            Write-Host "   Size: $([math]::Round($installer.Length / 1MB, 1)) MB"
+          } else {
+            Write-Host "❌ Build failed — no .exe found in release/"
+            exit 1
+          }
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kashikart-frontend-${{ github.ref_name || 'dev' }}
+          path: kashikart-gaurav/release/*.exe
+          retention-days: 30
+
+  # ───────────────────────────────────────────────────────────────
+  # JOB 3: Create GitHub Release (only on version tags)
+  # ───────────────────────────────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: kashikart-backend-${{ github.ref_name }}
+          path: artifacts/backend/
+
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: kashikart-frontend-${{ github.ref_name }}
+          path: artifacts/frontend/
+
+      - name: Zip backend distribution
+        run: |
+          cd artifacts
+          zip -r KashiKart-Backend-${{ github.ref_name }}.zip backend/
+          echo "Backend zip: $(du -sh KashiKart-Backend-${{ github.ref_name }}.zip)"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: KashiKart ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## KashiKart ${{ github.ref_name }} — Windows Release
+
+            ### What's Included
+            | File | Description |
+            |------|-------------|
+            | `KashiKart-Backend-*.zip` | Python FastAPI backend (extract and run `main.exe`) |
+            | `Kashikart Frontend Setup *.exe` | Windows installer for the Electron frontend |
+
+            ### Installation
+            1. Extract the backend zip → run `main.exe` first
+            2. Run the frontend installer → launch from Start Menu
+            3. See the deployment guide for full instructions
+
+            ---
+            *Built automatically on `windows-latest` via GitHub Actions*
+          files: |
+            artifacts/KashiKart-Backend-${{ github.ref_name }}.zip
+            artifacts/frontend/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,1 @@
+"""Kashikart application package."""

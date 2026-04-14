@@ -1,0 +1,13 @@
+﻿2026-03-17 13:44:28,806 INFO sqlalchemy.engine.Engine SELECT DATABASE()
+2026-03-17 13:44:28,806 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-17 13:44:28,807 INFO sqlalchemy.engine.Engine SELECT @@sql_mode
+2026-03-17 13:44:28,807 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-17 13:44:28,807 INFO sqlalchemy.engine.Engine SELECT @@lower_case_table_names
+2026-03-17 13:44:28,807 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-17 13:44:28,808 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-03-17 13:44:28,826 INFO sqlalchemy.engine.Engine SELECT sources.id, sources.name, sources.url, sources.description, sources.login_type, sources.login_url, sources.username, sources.encrypted_password, sources.scraper_type, sources.selector_config, sources.login_required, sources.password, sources.status, sources.is_active, sources.is_healthy, sources.total_tenders, sources.last_fetch_at, sources.last_success_at, sources.consecutive_failures, sources.created_at, sources.updated_at 
+FROM sources 
+WHERE lower(sources.name) LIKE lower(%s)
+2026-03-17 13:44:28,826 INFO sqlalchemy.engine.Engine [generated in 0.00022s] ('%Asian Development%',)
+Not found
+2026-03-17 13:44:28,829 INFO sqlalchemy.engine.Engine ROLLBACK

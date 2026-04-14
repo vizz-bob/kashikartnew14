@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Test HTML Source",
+    "model_total": 2,
+    "db_real": 2
+  },
+  {
+    "id": 2,
+    "name": "GeM Portal",
+    "model_total": 1,
+    "db_real": 1
+  },
+  {
+    "id": 3,
+    "name": "India Tenders Portal",
+    "model_total": 1,
+    "db_real": 1
+  },
+  {
+    "id": 4,
+    "name": "SAM.gov",
+    "model_total": 2,
+    "db_real": 2
+  },
+  {
+    "id": 5,
+    "name": "Test Site",
+    "model_total": 1,
+    "db_real": 1
+  },
+  {
+    "id": 6,
+    "name": "World Bank Procurement",
+    "model_total": 0,
+    "db_real": 0
+  },
+  {
+    "id": 7,
+    "name": "Manual Test Source",
+    "model_total": 0,
+    "db_real": 0
+  },
+  {
+    "id": 8,
+    "name": "Manual Test Source",
+    "model_total": 0,
+    "db_real": 0
+  },
+  {
+    "id": 9,
+    "name": "Manual Test Source",
+    "model_total": 0,
+    "db_real": 0
+  },
+  {
+    "id": 10,
+    "name": "Final Verification Source",
+    "model_total": 1,
+    "db_real": 1
+  }
+]

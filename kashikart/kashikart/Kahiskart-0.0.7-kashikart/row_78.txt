@@ -1,0 +1,9 @@
+Col 0 (Sno.): 78.0
+Col 1 (Web Source Data Link (Links of Tender Release Sources)): https://www.demandstar.com/app/suppliers/bids?states=38&includeExternalBids=true
+Col 2 (Source): Demandstar
+Col 3 (User Login Required?): Yes
+Col 4 (User): ajjubravo@gmail.com
+Col 5 (Password): Aspireone725#
+Col 6 (Remarks): nan
+Col 7 (acess): Not Accessible
+Col 8 (Unnamed: 8): Requires authentication and bot protection

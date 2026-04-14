@@ -1,0 +1,6 @@
+{
+  "id": 4,
+  "url": "https://sam.gov/search/?index=opp",
+  "scraper": "html",
+  "config": {}
+}

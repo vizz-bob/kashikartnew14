@@ -1,0 +1,387 @@
+# import pandas as pd
+# import hashlib
+# import json
+# from datetime import datetime
+
+# import pandas as pd
+# import hashlib
+# import json
+# from datetime import datetime
+
+# from sqlalchemy import select
+
+# from app.core.database import AsyncSessionLocal
+# from app.models.excel_raw import ExcelFile ,ExcelSheet ,ExcelRowRaw
+
+
+# class ExcelProcessorLocal:
+
+#     # FILE_PATH = r"C:/Users/abhis/OneDrive/Documents/WebArcligthIntern/PYTHON/Kahiskart/data/VendorLinkFile.xlsx"
+#     FILE_PATH = r"C:/Users/abhis/OneDrive/Documents/WebArcligthIntern/PYTHON/Kahiskart/data/All Source Web Links (2).xlsx"
+#     SHEET_NAME = "VendorLink"
+
+#     # -----------------------------
+#     # HASH
+#     # -----------------------------
+#     @staticmethod
+#     def row_hash(row_dict: dict) -> str:
+#         normalized = {
+#             k: "" if v is None or pd.isna(v) else str(v).strip()
+#             for k, v in row_dict.items()
+#         }
+#         raw = json.dumps(normalized, sort_keys=True)
+#         return hashlib.sha256(raw.encode()).hexdigest()
+
+#     # -----------------------------
+#     # MAIN
+#     # -----------------------------
+#     @staticmethod
+#     async def process_excel_once():
+#         print("\n <-> START EXCEL PROCESS")
+
+#         async with AsyncSessionLocal() as db:
+
+#             # READ EXCEL
+#             df = pd.read_excel(
+#                 ExcelProcessorLocal.FILE_PATH,
+#                 sheet_name=ExcelProcessorLocal.SHEET_NAME
+#             )
+
+#             print("|| TOTAL ROWS:", len(df))
+#             print("|| COLUMNS:", df.columns.tolist())
+
+#             # FILE
+#             result = await db.execute(
+#                 select(ExcelFile).where(
+#                     ExcelFile.file_path == ExcelProcessorLocal.FILE_PATH
+#                 )
+#             )
+#             excel_file = result.scalar_one_or_none()
+
+#             if not excel_file:
+#                 excel_file = ExcelFile(
+#                     file_path=ExcelProcessorLocal.FILE_PATH,
+#                     created_at=datetime.utcnow()
+#                 )
+#                 db.add(excel_file)
+#                 await db.commit()
+#                 await db.refresh(excel_file)
+
+#             print(" >: ExcelFile ID:", excel_file.id)
+
+#             # SHEET
+#             result = await db.execute(
+#                 select(ExcelSheet).where(
+#                     ExcelSheet.excel_file_id == excel_file.id,
+#                     ExcelSheet.sheet_name == ExcelProcessorLocal.SHEET_NAME
+#                 )
+#             )
+#             excel_sheet = result.scalar_one_or_none()
+
+#             if not excel_sheet:
+#                 excel_sheet = ExcelSheet(
+#                     excel_file_id=excel_file.id,
+#                     sheet_name=ExcelProcessorLocal.SHEET_NAME,
+#                     status="ACTIVE"
+#                 )
+#                 db.add(excel_sheet)
+#                 await db.commit()
+#                 await db.refresh(excel_sheet)
+
+#             print(" >>: ExcelSheet ID:", excel_sheet.id)
+
+#             inserted = 0
+#             skipped = 0
+
+#             # ROWS
+#             for index, row in df.iterrows():
+#                 row_data = row.to_dict()
+#                 hash_value = ExcelProcessorLocal.row_hash(row_data)
+
+#                 result = await db.execute(
+#                     select(ExcelRowRaw).where(
+#                         ExcelRowRaw.row_hash == hash_value
+#                     )
+#                 )
+#                 existing = result.scalar_one_or_none()
+
+#                 if existing:
+#                     skipped += 1
+#                     continue
+
+#                 db.add(
+#                     ExcelRowRaw(
+#                         sheet_id=excel_sheet.id,
+#                         row_data=row_data,
+#                         row_hash=hash_value,
+#                         created_at=datetime.utcnow()
+#                     )
+#                 )
+#                 inserted += 1
+
+#             await db.commit()
+
+#             print("\n _/ DONE !")
+#             print(" _/INSERTED:", inserted)
+#             print(" >>> SKIPPED:", skipped)
+# ------------------------Auto-------------------------------
+
+# import pandas as pd
+# import hashlib
+# import json
+# from datetime import datetime
+
+# from sqlalchemy import select
+# from app.core.database import AsyncSessionLocal
+# from app.models.excel_raw import ExcelFile, ExcelSheet, ExcelRowRaw
+
+
+# class ExcelProcessorLocal:
+
+#     FILE_PATH = r"C:/Users/abhis/OneDrive/Documents/WebArcligthIntern/PYTHON/Kahiskart/data/All Source Web Links (2).xlsx"
+
+#     # --------------------------------------
+#     # CLEAN ROW FOR MYSQL JSON
+#     # --------------------------------------
+#     @staticmethod
+#     def clean_row(row_dict: dict) -> dict:
+#         clean = {}
+#         for k, v in row_dict.items():
+#             if pd.isna(v):
+#                 clean[k] = None   # MySQL JSON safe
+#             else:
+#                 clean[k] = str(v).strip()
+#         return clean
+
+#     # --------------------------------------
+#     # HASH
+#     # --------------------------------------
+#     @staticmethod
+#     def row_hash(row_dict: dict) -> str:
+#         raw = json.dumps(row_dict, sort_keys=True)
+#         return hashlib.sha256(raw.encode()).hexdigest()
+
+#     # --------------------------------------
+#     # MAIN PROCESS
+#     # --------------------------------------
+#     @staticmethod
+#     async def process_excel_once():
+#         print("\n================ START EXCEL PROCESS ================")
+
+#         async with AsyncSessionLocal() as db:
+
+#             # LOAD ALL SHEETS
+#             xls = pd.ExcelFile(ExcelProcessorLocal.FILE_PATH)
+#             sheet_names = xls.sheet_names
+#             print("ALL SHEETS FOUND:", sheet_names)
+
+#             # --------------------------------------
+#             # FILE ENTRY
+#             # --------------------------------------
+#             result = await db.execute(
+#                 select(ExcelFile).where(
+#                     ExcelFile.file_path == ExcelProcessorLocal.FILE_PATH
+#                 )
+#             )
+#             excel_file = result.scalar_one_or_none()
+
+#             if not excel_file:
+#                 excel_file = ExcelFile(
+#                     file_path=ExcelProcessorLocal.FILE_PATH,
+#                     created_at=datetime.utcnow()
+#                 )
+#                 db.add(excel_file)
+#                 await db.commit()
+#                 await db.refresh(excel_file)
+
+#             print("ExcelFile ID:", excel_file.id)
+
+#             # --------------------------------------
+#             # LOOP ALL SHEETS
+#             # --------------------------------------
+#             for sheet_name in sheet_names:
+#                 print(f"\n========== PROCESSING SHEET: {sheet_name} ==========")
+
+#                 df = pd.read_excel(ExcelProcessorLocal.FILE_PATH, sheet_name=sheet_name)
+
+#                 print("TOTAL ROWS:", len(df))
+#                 print("COLUMNS:", df.columns.tolist())
+
+#                 # SHEET ENTRY
+#                 result = await db.execute(
+#                     select(ExcelSheet).where(
+#                         ExcelSheet.excel_file_id == excel_file.id,
+#                         ExcelSheet.sheet_name == sheet_name
+#                     )
+#                 )
+#                 excel_sheet = result.scalar_one_or_none()
+
+#                 if not excel_sheet:
+#                     excel_sheet = ExcelSheet(
+#                         excel_file_id=excel_file.id,
+#                         sheet_name=sheet_name,
+#                         status="ACTIVE"
+#                     )
+#                     db.add(excel_sheet)
+#                     await db.commit()
+#                     await db.refresh(excel_sheet)
+
+#                 print("Sheet ID:", excel_sheet.id)
+
+#                 inserted = 0
+#                 skipped = 0
+
+#                 # --------------------------------------
+#                 # ROW LOOP
+#                 # --------------------------------------
+#                 for index, row in df.iterrows():
+#                     raw_row = row.to_dict()
+#                     row_data = ExcelProcessorLocal.clean_row(raw_row)
+#                     hash_value = ExcelProcessorLocal.row_hash(row_data)
+
+#                     # CHECK DUPLICATE
+#                     result = await db.execute(
+#                         select(ExcelRowRaw).where(
+#                             ExcelRowRaw.row_hash == hash_value
+#                         )
+#                     )
+#                     existing = result.scalar_one_or_none()
+
+#                     if existing:
+#                         skipped += 1
+#                         continue
+
+#                     db.add(
+#                         ExcelRowRaw(
+#                             sheet_id=excel_sheet.id,
+#                             row_index=int(index),
+#                             row_data=row_data,
+#                             row_hash=hash_value,
+#                             created_at=datetime.utcnow()
+#                         )
+#                     )
+#                     inserted += 1
+
+#                 await db.commit()
+
+#                 print(f"✔ INSERTED: {inserted}")
+#                 print(f"⚠ SKIPPED (DUPLICATE): {skipped}")
+
+#         print("\n================ EXCEL PROCESS DONE ================")
+
+from sqlalchemy import select
+import pandas as pd
+import hashlib
+import json
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
+from app.core.database import engine, AsyncSessionLocal
+from app.models.excel_raw import ExcelFile, ExcelSheet, ExcelRowRaw
+
+
+class ExcelProcessorLocal:
+
+    # =========================
+    # HASH FUNCTION
+    # =========================
+    @staticmethod
+    def row_hash(row_dict):
+        return hashlib.sha256(json.dumps(row_dict, sort_keys=True).encode()).hexdigest()
+
+    # =========================
+    # BULK INSERT CHUNK
+    # =========================
+    @staticmethod
+    def insert_chunk(chunk_df):
+        chunk_df.to_sql(
+            "excel_row_raw_bulk",   # temp bulk table (optional)
+            con=engine,
+            if_exists="append",
+            index=False,
+            method="multi"   # FAST MODE
+        )
+
+    # =========================
+    # PROCESS SINGLE SHEET FAST
+    # =========================
+    @staticmethod
+    async def process_single_sheet(file_path, sheet_name, db):
+        print(f"-> Processing Sheet: {sheet_name}")
+
+        CHUNK_SIZE = 2000
+        executor = ThreadPoolExecutor(max_workers=5)
+
+        # Get ExcelFile
+        result = await db.execute(select(ExcelFile).where(ExcelFile.file_path == file_path))
+        excel_file = result.scalar_one()
+
+        # Get or Create Sheet
+        result = await db.execute(
+            select(ExcelSheet).where(
+                ExcelSheet.excel_file_id == excel_file.id,
+                ExcelSheet.sheet_name == sheet_name
+            )
+        )
+        excel_sheet = result.scalar_one_or_none()
+
+        if not excel_sheet:
+            excel_sheet = ExcelSheet(
+                excel_file_id=excel_file.id,
+                sheet_name=sheet_name,
+                status="ACTIVE"
+            )
+            db.add(excel_sheet)
+            await db.commit()
+            await db.refresh(excel_sheet)
+
+        inserted = 0
+
+        # Read in chunks
+        for chunk in pd.read_excel(file_path, sheet_name=sheet_name, chunksize=CHUNK_SIZE):
+            rows = []
+
+            for _, row in chunk.iterrows():
+                row_data = row.to_dict()
+                h = ExcelProcessorLocal.row_hash(row_data)
+
+                rows.append({
+                    "sheet_id": excel_sheet.id,
+                    "row_data": row_data,
+                    "row_hash": h,
+                    "created_at": datetime.utcnow()
+                })
+
+            # Convert to DataFrame for fast insert
+            bulk_df = pd.DataFrame(rows)
+
+            # Run in thread (non-blocking)
+            executor.submit(ExcelProcessorLocal.insert_chunk, bulk_df)
+
+            inserted += len(rows)
+
+        print(f"[\_/] Inserted {inserted} rows in {sheet_name}")
+
+    # =========================
+    # PROCESS ALL REGISTERED FILES
+    # =========================
+    @staticmethod
+    async def process_all_registered_files():
+        print("\n AUTO EXCEL FETCH START")
+
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(select(ExcelFile))
+            files = result.scalars().all()
+
+            print(f"TOTAL FILES: {len(files)}")
+
+            for file in files:
+                file_path = file.file_path.replace("\\", "/")
+                print(f"\n [/] File: {file_path}")
+
+                excel = pd.ExcelFile(file_path)
+                sheets = excel.sheet_names
+
+                for sheet in sheets:
+                    await ExcelProcessorLocal.process_single_sheet(file_path, sheet, db)
+
+        print("\n AUTO EXCEL FETCH DONE")

@@ -1,0 +1,23 @@
+=== Duplicate URL Report ===
+URL: https://bendoregon.bonfirehub.com/portal/?tab=openOpportunities | Count: 2
+URL: https://vendors.planetbids.com/portal/15598/bo/bo-search | Count: 2
+URL: https://clarkpud.procureware.com/Bids | Count: 2
+URL: https://www.oregonbids.com/government-agencies/multnomah/tri-county-metro-transportation-district-tri-met-12429/ | Count: 2
+URL: https://login.onlineplanservice.com/SP/entity.aspx?type=publicworks&prid=COBE | Count: 2
+URL: https://www.imsinfo.com/Client/Documents/Cip_Files/Skagit-Council-of-Governments-SCOG-2025-2030-TIP_2192025115030.pdf | Count: 9
+URL: https://www.imsinfo.com/Client/Documents/Cip_Files/Benton-Franklin-Council-of-Governments-BFCOG-2025-2028-Adopted-TIP_1218202410728.pdf | Count: 12
+URL: https://www.imsinfo.com/Client/Documents/Cip_Files/Whatcom-Council-of-Governments-WCOG-2025-TIP_18202532059.pdf | Count: 13
+
+=== Duplicate Name Report ===
+Name: BidLocker | Count: 3
+Name: Bonfirehub | Count: 10
+Name: City of Vancouver | Count: 3
+Name: Demandstar | Count: 3
+Name: HigherGov | Count: 4
+Name: Myvendorlink | Count: 3
+Name: opengov | Count: 55
+Name: Orange County | Count: 2
+Name: Polk County | Count: 2
+Name: Port of Seattle | Count: 2
+Name: Procureware.com | Count: 2
+Name: Vendorlink | Count: 3
